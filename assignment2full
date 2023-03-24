@@ -1,0 +1,108 @@
+#include <Ticker.h>
+
+// Declare global variables for LED and input signals
+const int LED = 15;
+const int signal1 = 21;
+const int signal2 = 22;
+const int signal3 = 4;
+
+int t2freq = 0;
+int t3freq = 0;
+
+#define FRAME_DURATION_MS 10     // 10ms
+#define FRAME_DURATION_MICROS (FRAME_DURATION_MS * 1000)
+
+Ticker ticker;
+
+unsigned long frameStartTime = 0;
+unsigned long frameCounter = 0;
+
+void setup(void)
+{
+  Serial.begin(9600);
+  pinMode(LED, OUTPUT);
+  pinMode(signal1, INPUT);
+  pinMode(signal2, INPUT);
+  pinMode(signal3, INPUT);
+
+  ticker.attach_ms(FRAME_DURATION_MS, loop);
+}
+
+void Task1() {
+  // Blink LED sequence
+  digitalWrite(15, HIGH);
+  delayMicroseconds(200);
+  digitalWrite(15, LOW);
+  delayMicroseconds(50);
+  digitalWrite(15, HIGH);
+  delayMicroseconds(30);
+}
+
+void Task2() {
+  // (Code from previous Task2 implementation)
+}
+
+void Task3() {
+  // (Code from previous Task3 implementation)
+}
+
+void Task4() {
+  static bool switch1 = false;
+  static bool switch2 = false;
+  static int array4[4];
+
+  // Read signal3 and store values in array4
+  if (!switch1 && !switch2) {
+    array4[0] = analogRead(signal3);
+    switch1 = false;
+    switch2 = true;
+  } else if (!switch1 && switch2) {
+    array4[1] = analogRead(signal3);
+    switch1 = true;
+    switch2 = false;
+  } else if (switch1 && !switch2) {
+    array4[2] = analogRead(signal3);
+    switch1 = true;
+    switch2 = true;
+  } else if (switch1 && switch2) {
+    array4[3] = analogRead(signal3);
+    switch1 = false;
+    switch2 = false;
+  }
+
+  // Averaging the last values
+  int Average = (array4[0] + array4[1] + array4[2] + array4[3]) / 4;
+  Serial.println(Average);
+}
+
+void frame()
+{
+  unsigned int slot = frameCounter % 10;
+
+  switch (slot) {
+    case 0: Task1(); Task3(); break;
+    case 1: Task2(); break;
+    case 2: Task1(); break;
+    case 3: Task4(); break;
+    case 4: Task2(); break;
+    case 5: Task1(); break;
+    case 6: Task2(); break;
+    case 7: Task1(); break;
+    case 8: Task1(); break;
+    case 9: Task2(); break;
+  }
+
+  frameCounter++;
+}
+
+void loop(void)
+{
+  frameStartTime = micros();
+  frame();
+  unsigned long frameElapsedTime = micros() - frameStartTime;
+
+  if (frameElapsedTime > FRAME_DURATION_MICROS) {
+    Serial.print("Frame overrun: ");
+    Serial.println(frameElapsedTime);
+  }
+}
