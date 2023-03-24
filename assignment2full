@@ -23,7 +23,6 @@ void setup(void)
   pinMode(LED, OUTPUT);
   pinMode(signal1, INPUT);
   pinMode(signal2, INPUT);
-  pinMode(signal3, INPUT);
 
   ticker.attach_ms(FRAME_DURATION_MS, loop);
 }
@@ -39,40 +38,124 @@ void Task1() {
 }
 
 void Task2() {
-  // (Code from previous Task2 implementation)
+   int f[] = {0,0};
+  bool switch1 =false;
+  bool start = false;
+    // Read signal1 and store values in f array alternatively
+  if (switch1 == false)
+  {
+    f[0] = digitalRead(signal1);
+  switch1 = true;
+  }
+  else {
+    f[1] = digitalRead(signal1);
+    switch1 = false;
+}
+int time2;
+int time1;
+int freq;
+
+   // Calculate time difference between signal changes
+
+if (f[0] != f[1]){
+if (f[0] != f[1] && start == true){
+  time2 = millis();
+start = false;
+}
+
+int time1 = millis();
+start = true;
+  // Calculate frequency
+}
+int time = (time2 - time1) * 2;
+
+if (time > 0){
+  freq=1/time;
+}
+
+// print frequency
+Serial.println(freq);
+t2freq=freq;
+}
 }
 
 void Task3() {
-  // (Code from previous Task3 implementation)
+   int f[1];// Array to store the last two signal readings
+  bool switch1 =false;
+  bool start = false;
+    // Read signal2 and store values in f array alternatively
+
+  if (switch1 == false)
+  {
+    f[0] = digitalRead(signal2);
+  switch1 = true;
+  }
+  else {
+    f[1] = digitalRead(signal2);
+    switch1 = false;
+}
+int time1;
+int time2;
+  // Calculate time difference between signal changes
+if (f[0] !=f[1]){
+if (f[0] !=f[1] && start == true){
+  int time2 = millis();
+start = false;
+}
+
+int time1 = millis();
+start = true;
+
+
+}
+int time= (time2-time1) * 2;
+  // Calculate frequency
+
+int freq=1/time;
+Serial.println(freq);
+t3freq=freq;
+}
+
+bool switch1= false;
+bool switch2= false;
+int array4[3];
+
 }
 
 void Task4() {
-  static bool switch1 = false;
-  static bool switch2 = false;
-  static int array4[4];
-
-  // Read signal3 and store values in array4
-  if (!switch1 && !switch2) {
-    array4[0] = analogRead(signal3);
+     // Read signal3 and store values in array4
+ 
+  if (switch1 == false && switch2 == false)
+  {
+    array4[0]=analogRead(signal3);
     switch1 = false;
     switch2 = true;
-  } else if (!switch1 && switch2) {
-    array4[1] = analogRead(signal3);
-    switch1 = true;
-    switch2 = false;
-  } else if (switch1 && !switch2) {
-    array4[2] = analogRead(signal3);
-    switch1 = true;
-    switch2 = true;
-  } else if (switch1 && switch2) {
-    array4[3] = analogRead(signal3);
-    switch1 = false;
-    switch2 = false;
+  }
+  else if (switch1 == false && switch2 == true)
+  {
+     array4[1]=analogRead(signal3); 
+     switch1= true;
+     switch2 = false;
+   
   }
 
-  // Averaging the last values
-  int Average = (array4[0] + array4[1] + array4[2] + array4[3]) / 4;
+  else if (switch1 == true && switch2 == false)
+  {
+     array4[2]=analogRead(signal3);
+    switch2 = true;
+    switch1= true;
+  }
+   else if (switch1== true && switch2 == true)
+    {
+        array4[3]=analogRead(signal3);
+    switch2 = false;
+    switch1= false;
+    }
+// avreageing the last values
+  int Average = (array4[0] + array4[1] + array4[2] + array4[3])/4;
   Serial.println(Average);
+}
+
 }
 
 void frame()
